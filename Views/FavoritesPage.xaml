@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="NewsApp.Views.FavoritesPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:NewsApp.Models"
+    Title="{Binding Title}">
+
+    <Grid>
+        <!-- Lista de favoritos -->
+        <RefreshView Command="{Binding RefreshCommand}" IsRefreshing="{Binding IsBusy}">
+            <CollectionView ItemsSource="{Binding FavoriteNews}" SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:NewsItem">
+                        <Grid Padding="15,10">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ItemTappedCommand}" CommandParameter="{Binding .}" />
+                            </Grid.GestureRecognizers>
+
+                            <Border
+                                BackgroundColor="White"
+                                Stroke="#E0E0E0"
+                                StrokeThickness="1">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="12" />
+                                </Border.StrokeShape>
+
+                                <Grid Padding="15" ColumnDefinitions="100,*,Auto">
+                                    <!-- Imagen pequeña -->
+                                    <Image
+                                        Grid.Column="0"
+                                        Aspect="AspectFill"
+                                        HeightRequest="80"
+                                        Source="{Binding ImageUrl}"
+                                        WidthRequest="100">
+                                        <Image.Clip>
+                                            <RoundRectangleGeometry CornerRadius="8" Rect="0,0,100,80" />
+                                        </Image.Clip>
+                                    </Image>
+
+                                    <!-- Contenido -->
+                                    <StackLayout Grid.Column="1" Padding="15,0,0,0" Spacing="5" VerticalOptions="Center">
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="14"
+                                            LineBreakMode="WordWrap"
+                                            MaxLines="2"
+                                            Text="{Binding Title}"
+                                            TextColor="#333" />
+
+                                        <Label
+                                            FontSize="12"
+                                            Text="{Binding Source}"
+                                            TextColor="#999" />
+
+                                        <Label
+                                            FontSize="12"
+                                            Text="{Binding PublishedAt, StringFormat='{0:dd/MM/yyyy HH:mm}'}"
+                                            TextColor="#999" />
+                                    </StackLayout>
+
+                                    <!-- Botón eliminar -->
+                                    <Button
+                                        Grid.Column="2"
+                                        BackgroundColor="Transparent"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemoveFavoriteCommand}"
+                                        CommandParameter="{Binding .}"
+                                        FontSize="18"
+                                        Text="✕"
+                                        TextColor="#FF6B6B"
+                                        VerticalOptions="Start"
+                                        WidthRequest="30" />
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+        <!-- Mensaje cuando no hay favoritos -->
+        <StackLayout IsVisible="{Binding FavoriteNews.Count, Converter={StaticResource CountToBoolConverter}}" HorizontalOptions="Center" VerticalOptions="Center">
+            <Label
+                FontSize="18"
+                HorizontalOptions="Center"
+                Text="No tienes noticias favoritas"
+                TextColor="#999" />
+            <Label
+                FontSize="14"
+                HorizontalOptions="Center"
+                Text="Agrega noticias desde la pestaña 'Últimas'"
+                TextColor="#CCC" />
+        </StackLayout>
+    </Grid>
+
+</ContentPage>
